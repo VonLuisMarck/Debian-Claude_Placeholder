@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "claude-hub": {
+      "command": "ssh",
+      "args": [
+        "-i", "~/.ssh/claude_hub_key",
+        "-T",
+        "claude-agent@<IP_VM>",
+        "cd /opt/claude-hub && source venv/bin/activate && python mcp_server.py"
+      ]
+    }
+  }
+}
