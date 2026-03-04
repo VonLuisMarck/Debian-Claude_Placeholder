@@ -29,8 +29,9 @@ apt update && apt install -y \
     ca-certificates gnupg
 
 # ── 3. Fix SSL certificates (resolves npm UNABLE_TO_GET_ISSUER_CERT_LOCALLY) ──
-log_info "Updating CA certificates..."
-update-ca-certificates --fresh
+log_info "Configuring SSL certificates for npm..."
+# apt install ca-certificates already regenerates the bundle via dpkg triggers.
+# We just point npm to the system CA file.
 npm config set cafile /etc/ssl/certs/ca-certificates.crt
 export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 
