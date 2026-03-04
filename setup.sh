@@ -1,6 +1,6 @@
 #!/bin/bash
-# Setup script for Claude Code on Debian
-# Fixes SSL certificate issues and installs Claude Code
+# Setup script for Claude Hub on Debian
+# Fixes SSL certificate issues and installs all dependencies
 
 set -e
 
@@ -13,68 +13,66 @@ log_info()  { echo -e "${GREEN}[INFO]${NC}  $1"; }
 log_warn()  { echo -e "${YELLOW}[WARN]${NC}  $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+echo "=== Claude Hub Setup ==="
+
 # ── 1. Root check ──────────────────────────────────────────────────────────────
 if [ "$EUID" -ne 0 ]; then
     log_error "Please run as root: sudo bash setup.sh"
     exit 1
 fi
 
-# ── 2. Update CA certificates ──────────────────────────────────────────────────
+# ── 2. System dependencies ─────────────────────────────────────────────────────
+log_info "Installing system dependencies..."
+apt update && apt install -y \
+    python3 python3-pip python3-venv \
+    nodejs npm git curl openssh-server passwd \
+    ca-certificates gnupg
+
+# ── 3. Fix SSL certificates (resolves npm UNABLE_TO_GET_ISSUER_CERT_LOCALLY) ──
 log_info "Updating CA certificates..."
-apt-get update -qq
-apt-get install -y ca-certificates curl gnupg 2>/dev/null
-
 update-ca-certificates --fresh
-log_info "CA certificates updated."
-
-# ── 3. Ensure Node.js is installed ─────────────────────────────────────────────
-if ! command -v node &>/dev/null; then
-    log_info "Node.js not found. Installing via NodeSource (LTS)..."
-
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-
-    NODE_MAJOR=20
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] \
-https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" \
-        > /etc/apt/sources.list.d/nodesource.list
-
-    apt-get update -qq
-    apt-get install -y nodejs
-    log_info "Node.js $(node --version) installed."
-else
-    log_info "Node.js already installed: $(node --version)"
-fi
-
-# ── 4. Fix npm SSL configuration ───────────────────────────────────────────────
-log_info "Configuring npm SSL settings..."
-
-# Point npm to the system CA bundle
 npm config set cafile /etc/ssl/certs/ca-certificates.crt
-
-# Export for the current session as well
 export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 
-log_info "npm SSL configured."
-
-# ── 5. Install Claude Code ─────────────────────────────────────────────────────
-log_info "Installing @anthropic-ai/claude-code globally..."
-
-npm install -g @anthropic-ai/claude-code
-
-log_info "Claude Code installed: $(claude --version 2>/dev/null || echo 'check PATH')"
-
-# ── 6. Persist NODE_EXTRA_CA_CERTS for all users ──────────────────────────────
+# Persist for all future sessions
 ENV_FILE=/etc/environment
 if ! grep -q "NODE_EXTRA_CA_CERTS" "$ENV_FILE" 2>/dev/null; then
     echo "NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt" >> "$ENV_FILE"
     log_info "NODE_EXTRA_CA_CERTS persisted in $ENV_FILE."
 fi
 
+# ── 4. Dedicated user ─────────────────────────────────────────────────────────
+if ! id "claude-agent" &>/dev/null; then
+    /usr/sbin/useradd -m -s /bin/bash claude-agent
+    log_info "User claude-agent created."
+fi
+
+# ── 5. Working directory ───────────────────────────────────────────────────────
+mkdir -p /opt/claude-hub
+chown claude-agent:claude-agent /opt/claude-hub
+
+# ── 6. Python virtual environment ─────────────────────────────────────────────
+log_info "Setting up Python virtual environment..."
+python3 -m venv /opt/claude-hub/venv
+/opt/claude-hub/venv/bin/pip install -r /opt/Debian-Claude_Placeholder/requirements.txt
+
+# ── 7. Install Claude Code (with SSL fix applied above) ───────────────────────
+log_info "Installing @anthropic-ai/claude-code..."
+npm install -g @anthropic-ai/claude-code
+
+# ── 8. Copy server files ───────────────────────────────────────────────────────
+cp /opt/Debian-Claude_Placeholder/mcp_server.py /opt/claude-hub/mcp_server.py
+
+# ── 9. Configure .env ─────────────────────────────────────────────────────────
+if [ ! -f /opt/claude-hub/.env ]; then
+    cp /opt/Debian-Claude_Placeholder/.env.example /opt/claude-hub/.env
+    chmod 600 /opt/claude-hub/.env
+    echo ""
+    log_warn "IMPORTANTE: Edita /opt/claude-hub/.env y añade tu ANTHROPIC_API_KEY"
+fi
+
 echo ""
-log_info "Setup complete!"
-log_warn "Open a new terminal (or run: source /etc/environment) so the"
-log_warn "NODE_EXTRA_CA_CERTS variable takes effect in your session."
-echo ""
-log_info "Then authenticate with:  claude"
+echo "=== Setup completado ==="
+log_info "Próximo paso: edita /opt/claude-hub/.env con tu API key"
+log_info "Luego ejecuta: bash start_mcp.sh"
+log_warn "Abre un nuevo terminal (o: source /etc/environment) para que NODE_EXTRA_CA_CERTS tome efecto."

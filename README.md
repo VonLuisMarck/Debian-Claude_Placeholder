@@ -1,67 +1,97 @@
-# Debian · Claude Code — Setup
+# Debian-Claude Hub
 
-Placeholder repository with a setup script that fixes common SSL certificate
-errors when installing [Claude Code](https://claude.ai/code) on Debian-based
-systems.
+VM Debian centralizada con Claude Code y un MCP server orquestador. Tus agentes locales se conectan por SSH tunnel y delegan las llamadas a la API de Anthropic — las keys nunca salen de la VM.
 
----
-
-## Problem
-
-When running `npm install -g @anthropic-ai/claude-code` on a Debian system
-you may see:
+## Arquitectura
 
 ```
-npm ERR! code UNABLE_TO_GET_ISSUER_CERT_LOCALLY
-npm ERR! errno UNABLE_TO_GET_ISSUER_CERT_LOCALLY
-npm ERR! request to https://registry.npmjs.org/… failed,
-         reason: unable to get local issuer certificate
+Tu app local (agentes)
+        │
+        │  SSH Tunnel (stdio)
+        ▼
+  VM Debian (/opt/claude-hub)
+  ┌─────────────────────────────────┐
+  │  MCP Server (orquestador)       │
+  │    ├── router: lee "model" tag  │
+  │    ├── claude-opus-4-6          │
+  │    └── claude-sonnet-4-6        │
+  │                                 │
+  │  Claude Code (agente coding)    │
+  │                                 │
+  │  .env → ANTHROPIC_API_KEY       │
+  └─────────────────────────────────┘
 ```
 
-This happens because npm can't locate the system's root CA bundle.
+**Flujo:**
+1. Tu agente llama al tool `ask_claude` declarando `model: "opus"` o `"sonnet"`
+2. El MCP server recibe la llamada por el tunnel SSH
+3. Enruta al modelo correcto usando la API key centralizada
+4. Devuelve la respuesta al agente
 
----
+## Setup
 
-## Quick fix
+### 1. Preparar la VM Debian
 
 ```bash
+# Clonar el repo en la VM
+git clone https://github.com/TU_USUARIO/Debian-Claude_Placeholder.git /opt/Debian-Claude_Placeholder
+cd /opt/Debian-Claude_Placeholder
+
+# Ejecutar el setup (instala dependencias, crea usuario, configura /opt/claude-hub)
 sudo bash setup.sh
+
+# Añadir tu API key
+nano /opt/claude-hub/.env
 ```
 
-The script will:
+> **Nota SSL:** El script corrige automáticamente el error
+> `UNABLE_TO_GET_ISSUER_CERT_LOCALLY` que puede aparecer en Debian al instalar
+> `@anthropic-ai/claude-code` via npm.
 
-1. Install / refresh `ca-certificates` via `apt`.
-2. Install Node.js 20 LTS (via NodeSource) if it isn't already present.
-3. Point npm at `/etc/ssl/certs/ca-certificates.crt`.
-4. Install `@anthropic-ai/claude-code` globally.
-5. Persist `NODE_EXTRA_CA_CERTS` in `/etc/environment` for future sessions.
-
----
-
-## Manual fix (one-liner)
-
-If you only want to fix npm's SSL config without running the full script:
+### 2. Configurar SSH keys (en tu máquina local)
 
 ```bash
-sudo npm config set cafile /etc/ssl/certs/ca-certificates.crt
-export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
-npm install -g @anthropic-ai/claude-code
+bash setup_ssh_key.sh <IP_DE_LA_VM>
 ```
 
----
+### 3. Conectar tus agentes
 
-## Requirements
+Copia `mcp_config.example.json` a tu proyecto, reemplaza `<IP_VM>` con la IP real:
 
-| Requirement | Version |
-|-------------|---------|
-| Debian / Ubuntu | any supported release |
-| Node.js | ≥ 18 (script installs 20 LTS if missing) |
-| npm | bundled with Node |
+```json
+{
+  "mcpServers": {
+    "claude-hub": {
+      "command": "ssh",
+      "args": ["-i", "~/.ssh/claude_hub_key", "-T", "claude-agent@<IP_VM>",
+               "cd /opt/claude-hub && source venv/bin/activate && python mcp_server.py"]
+    }
+  }
+}
+```
 
----
-
-## After installation
+### 4. Probar
 
 ```bash
-claude   # launches Claude Code and prompts for authentication
+python agent_example.py
+```
+
+## Modelos disponibles
+
+| Alias    | Modelo                | Uso recomendado                      |
+|----------|-----------------------|--------------------------------------|
+| `opus`   | claude-opus-4-6       | Razonamiento complejo, análisis       |
+| `sonnet` | claude-sonnet-4-6     | Equilibrio calidad-velocidad, código  |
+
+## Seguridad
+
+- La `ANTHROPIC_API_KEY` vive solo en `/opt/claude-hub/.env` (permisos `600`)
+- Autenticación por SSH key, sin contraseñas
+- El usuario `claude-agent` puede restringirse a ejecutar solo el MCP server:
+
+```
+# /etc/ssh/sshd_config
+Match User claude-agent
+    ForceCommand /opt/claude-hub/venv/bin/python /opt/claude-hub/mcp_server.py
+    AllowTcpForwarding no
 ```
