@@ -3,6 +3,8 @@ set -e
 
 echo "=== Claude Hub Setup ==="
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # Dependencias del sistema
 apt update && apt install -y \
     python3 python3-pip python3-venv \
@@ -22,17 +24,17 @@ chown claude-agent:claude-agent /opt/claude-hub
 cd /opt/claude-hub
 python3 -m venv venv
 source venv/bin/activate
-pip install -r "$(dirname "$0")/requirements.txt"
+pip install -r "$SCRIPT_DIR/requirements.txt"
 
 # Instalar Claude Code
 npm install -g @anthropic-ai/claude-code
 
 # Copiar archivos del servidor
-cp "$(dirname "$0")/mcp_server.py" /opt/claude-hub/mcp_server.py
+cp "$SCRIPT_DIR/mcp_server.py" /opt/claude-hub/mcp_server.py
 
 # Configurar .env si no existe
 if [ ! -f /opt/claude-hub/.env ]; then
-    cp "$(dirname "$0")/.env.example" /opt/claude-hub/.env
+    cp "$SCRIPT_DIR/.env.example" /opt/claude-hub/.env
     chmod 600 /opt/claude-hub/.env
     echo ""
     echo "IMPORTANTE: Edita /opt/claude-hub/.env y añade tu ANTHROPIC_API_KEY"
