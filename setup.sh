@@ -10,7 +10,7 @@ apt update && apt install -y \
 
 # Crear usuario dedicado
 if ! id "claude-agent" &>/dev/null; then
-    useradd -m -s /bin/bash claude-agent
+    /usr/sbin/useradd -m -s /bin/bash claude-agent
     echo "Usuario claude-agent creado"
 fi
 
