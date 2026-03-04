@@ -20,17 +20,17 @@ chown claude-agent:claude-agent /opt/claude-hub
 
 # Entorno Python
 python3 -m venv /opt/claude-hub/venv
-/opt/claude-hub/venv/bin/pip install -r /opt/claude-hub-setup/requirements.txt
+/opt/claude-hub/venv/bin/pip install -r /opt/Debian-Claude_Placeholder/requirements.txt
 
 # Instalar Claude Code
 npm install -g @anthropic-ai/claude-code
 
 # Copiar archivos del servidor
-cp /opt/claude-hub-setup/mcp_server.py /opt/claude-hub/mcp_server.py
+cp /opt/Debian-Claude_Placeholder/mcp_server.py /opt/claude-hub/mcp_server.py
 
 # Configurar .env si no existe
 if [ ! -f /opt/claude-hub/.env ]; then
-    cp /opt/claude-hub-setup/.env.example /opt/claude-hub/.env
+    cp /opt/Debian-Claude_Placeholder/.env.example /opt/claude-hub/.env
     chmod 600 /opt/claude-hub/.env
     echo ""
     echo "IMPORTANTE: Edita /opt/claude-hub/.env y añade tu ANTHROPIC_API_KEY"
