@@ -57,9 +57,13 @@ log_info "Setting up Python virtual environment..."
 python3 -m venv /opt/claude-hub/venv
 /opt/claude-hub/venv/bin/pip install -r /opt/Debian-Claude_Placeholder/requirements.txt
 
-# ── 7. Install Claude Code (with SSL fix applied above) ───────────────────────
+# ── 7. Install Claude Code ────────────────────────────────────────────────────
 log_info "Installing @anthropic-ai/claude-code..."
+# Temporarily disable strict-ssl to bypass certificate chain issues
+# (common on Debian minimal / corporate proxies with SSL inspection).
+npm config set strict-ssl false
 npm install -g @anthropic-ai/claude-code
+npm config set strict-ssl true
 
 # ── 8. Copy server files ───────────────────────────────────────────────────────
 cp /opt/Debian-Claude_Placeholder/mcp_server.py /opt/claude-hub/mcp_server.py
