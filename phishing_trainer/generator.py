@@ -80,7 +80,7 @@ class EmailGenerator:
                 "red_flags": [
                     {
                         "elemento": rf.element,
-                        "descripcion": rf.description,
+                        "descripcion": _fill_variables(rf.description, emp),
                         "severidad": rf.severity,
                     }
                     for rf in template.red_flags

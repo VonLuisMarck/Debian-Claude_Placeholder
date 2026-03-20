@@ -158,6 +158,43 @@ Microsoft respeta su privacidad.
     ),
 
     PhishingTemplate(
+        scenario="vpn_acceso_caducado",
+        from_display="IT Security - VPN Operations",
+        from_email="vpn-ops@{empresa}-remote-access.net",
+        subject="[ACCIÓN REQUERIDA] Su acceso VPN expira hoy — renueve ahora",
+        body="""\
+Estimado/a {usuario},
+
+Su certificado de acceso remoto VPN corporativo expira HOY a las 23:59.
+
+A partir de mañana no podrá conectarse a la red corporativa, lo que
+afectará su acceso a unidades compartidas, sistemas internos y email.
+
+Renueve su acceso en el portal de seguridad:
+
+  https://vpn-renewal-{empresa}.net/auth/renew
+
+Credenciales necesarias para completar la renovación:
+  • Usuario de red (dominio\\usuario)
+  • Contraseña actual
+  • Código del token MFA
+
+Si ya no necesita acceso remoto, ignore este mensaje y su cuenta
+será desactivada automáticamente.
+
+IT Security Team
+""",
+        red_flags=[
+            RedFlag("from_email", "Dominio externo '{empresa}-remote-access.net' — el IT interno usa el dominio corporativo", "alta"),
+            RedFlag("enlace", "Portal de renovación en dominio externo, no en intranet corporativa", "alta"),
+            RedFlag("solicitud_mfa", "Pide el código MFA por escrito — los sistemas legítimos nunca lo hacen así", "alta"),
+            RedFlag("contrasena_actual", "Solicitar la contraseña actual es innecesario para una renovación real", "alta"),
+            RedFlag("plazo_hoy", "'Expira HOY' — presión de tiempo máxima para impedir que el usuario verifique", "alta"),
+            RedFlag("opt_out", "El 'ignórelo si no lo necesita' busca reducir la desconfianza del usuario", "baja"),
+        ]
+    ),
+
+    PhishingTemplate(
         scenario="rrhh_nomina",
         from_display="Recursos Humanos",
         from_email="rrhh-nominas@{empresa}-payroll.com",
