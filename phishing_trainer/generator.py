@@ -56,24 +56,41 @@ class EmailGenerator:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 
-    def generate(self, scenario: str) -> dict:
-        """Genera un email de phishing de entrenamiento para el escenario dado."""
+    def generate(self, scenario: str, custom_links: dict | None = None) -> dict:
+        """Generates a training phishing email for the given scenario.
+
+        Args:
+            scenario: Scenario key.
+            custom_links: Optional dict overriding link placeholders, e.g.
+                          {"link_verificacion": "https://my-training-site.com/trap"}.
+        """
         template = get_template(scenario)
         if not template:
-            raise ValueError(f"Escenario '{scenario}' no encontrado. Disponibles: {list_scenarios()}")
+            raise ValueError(f"Scenario '{scenario}' not found. Available: {list_scenarios()}")
 
         emp = random.choice(SAMPLE_VARS["empresa"])
+
+        # Resolve links: template defaults → custom overrides → fill variables
+        resolved_links = {
+            key: _fill_variables(custom_links.get(key, default), emp)
+            for key, default in template.links.items()
+        }
+
+        body = _fill_variables(template.body, emp)
+        for key, url in resolved_links.items():
+            body = body.replace("{" + key + "}", url)
+
         email = {
             "metadata": {
                 "scenario": template.scenario,
                 "generated_at": datetime.utcnow().isoformat(),
-                "purpose": "ENTRENAMIENTO DE SEGURIDAD — No es un email real",
+                "purpose": "SECURITY TRAINING — This is not a real email",
             },
             "email": {
                 "from_display": _fill_variables(template.from_display, emp),
                 "from_email": _fill_variables(template.from_email, emp),
                 "subject": _fill_variables(template.subject, emp),
-                "body": _fill_variables(template.body, emp),
+                "body": body,
             },
             "training": {
                 "total_red_flags": len(template.red_flags),
@@ -86,6 +103,7 @@ class EmailGenerator:
                     for rf in template.red_flags
                 ],
                 "summary": _build_summary(template.red_flags),
+                "links": resolved_links,
             },
         }
         return email

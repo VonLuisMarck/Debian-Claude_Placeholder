@@ -23,6 +23,7 @@ class PhishingTemplate:
     subject: str
     body: str
     red_flags: list[RedFlag] = field(default_factory=list)
+    links: dict = field(default_factory=dict)  # key → URL por defecto
 
 
 TEMPLATES: list[PhishingTemplate] = [
@@ -41,7 +42,7 @@ sus fondos, hemos suspendido temporalmente el acceso.
 Debe verificar su identidad en las próximas 24 HORAS o su cuenta
 será cerrada permanentemente.
 
-👉 Haga clic aquí para verificar: http://santander-verificacion-cuenta.xyz/login
+👉 Haga clic aquí para verificar: {link_verificacion}
 
 Necesitará:
 - Número de tarjeta completo
@@ -52,6 +53,9 @@ Atentamente,
 Equipo de Seguridad Santander
 © 2024 Banco Santander S.A.
 """,
+        links={
+            "link_verificacion": "http://santander-verificacion-cuenta.xyz/login",
+        },
         red_flags=[
             RedFlag("from_email", "Dominio 'santander-alertas.net' no es el oficial (santander.es)", "alta"),
             RedFlag("subject", "Urgencia artificial para presionar al usuario a actuar sin pensar", "alta"),
@@ -76,7 +80,7 @@ Si no actualiza su contraseña en las próximas 2 horas, perderá
 acceso a todos los sistemas corporativos incluyendo email y VPN.
 
 Acceda al portal de autoservicio para actualizar:
-https://portal-empleados-actualizacion.net/password-reset
+{link_portal}
 
 Usuario detectado: {usuario}@suempresa.com
 
@@ -84,6 +88,9 @@ Este es un mensaje automático del sistema. No responda a este correo.
 
 IT Helpdesk
 """,
+        links={
+            "link_portal": "https://portal-empleados-actualizacion.net/password-reset",
+        },
         red_flags=[
             RedFlag("from_email", "El dominio no corresponde al dominio corporativo real de la empresa", "alta"),
             RedFlag("enlace", "URL externa no corporativa para introducir credenciales internas", "alta"),
@@ -109,12 +116,15 @@ Para programar una nueva entrega o recogerlo en oficina debe abonar
 los gastos de gestión: 1,95 €
 
 Pague aquí y programe su entrega:
-http://correos-reentrega.net/pago?ref={tracking}
+{link_pago}
 
 El paquete será devuelto al remitente en 72 horas si no actúa.
 
 Correos España
 """,
+        links={
+            "link_pago": "http://correos-reentrega.net/pago?ref={tracking}",
+        },
         red_flags=[
             RedFlag("from_email", "Dominio 'correos-entrega-es.com' no es correos.es (dominio oficial)", "alta"),
             RedFlag("enlace", "URL de pago en dominio no oficial — robo de datos de tarjeta", "alta"),
@@ -141,13 +151,16 @@ Hemos detectado un inicio de sesión desde una ubicación inusual:
 Si NO fue usted, debe asegurar su cuenta de inmediato:
 
   [ PROTEGER MI CUENTA AHORA ]
-  https://microsoft-account-security-alert.com/recover
+  {link_recuperar}
 
 Si FUE usted, puede ignorar este mensaje.
 
 Microsoft respeta su privacidad.
 © Microsoft Corporation, One Microsoft Way, Redmond, WA 98052
 """,
+        links={
+            "link_recuperar": "https://microsoft-account-security-alert.com/recover",
+        },
         red_flags=[
             RedFlag("from_email", "Microsoft usa @accountprotection.microsoft.com, nunca dominios externos", "alta"),
             RedFlag("enlace", "Dominio 'microsoft-account-security-alert.com' no es microsoft.com", "alta"),
@@ -172,7 +185,7 @@ afectará su acceso a unidades compartidas, sistemas internos y email.
 
 Renueve su acceso en el portal de seguridad:
 
-  https://vpn-renewal-{empresa}.net/auth/renew
+  {link_renovar}
 
 Credenciales necesarias para completar la renovación:
   • Usuario de red (dominio\\usuario)
@@ -184,6 +197,9 @@ será desactivada automáticamente.
 
 IT Security Team
 """,
+        links={
+            "link_renovar": "https://vpn-renewal-{empresa}.net/auth/renew",
+        },
         red_flags=[
             RedFlag("from_email", "Dominio externo '{empresa}-remote-access.net' — el IT interno usa el dominio corporativo", "alta"),
             RedFlag("enlace", "Portal de renovación en dominio externo, no en intranet corporativa", "alta"),
@@ -207,7 +223,7 @@ necesario que confirme sus datos bancarios actualizados antes del
 {fecha_limite} para garantizar el cobro de su nómina de {mes}.
 
 Acceda al portal de empleados para actualizar:
-https://empleados-{empresa}-nominas.net/actualizar-cuenta
+{link_portal}
 
 Datos a confirmar:
 - IBAN completo
@@ -219,6 +235,9 @@ podría retrasarse hasta el siguiente periodo.
 
 Departamento de RRHH
 """,
+        links={
+            "link_portal": "https://empleados-{empresa}-nominas.net/actualizar-cuenta",
+        },
         red_flags=[
             RedFlag("from_email", "El dominio '{empresa}-payroll.com' no es el dominio corporativo real", "alta"),
             RedFlag("enlace", "URL externa para introducir datos bancarios — no es el portal corporativo", "alta"),

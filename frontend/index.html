@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,478 +18,517 @@
     header {
       background: #1a1d27;
       border-bottom: 1px solid #2d3147;
-      padding: 16px 32px;
+      padding: 0 28px;
+      height: 54px;
       display: flex;
       align-items: center;
       gap: 14px;
     }
-    header .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: #f8fafc;
-      letter-spacing: -0.3px;
-    }
-    header .badge {
-      background: #dc2626;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: .5px;
+    .logo { font-size: 18px; font-weight: 700; color: #f8fafc; letter-spacing: -.3px; }
+    .badge {
+      background: #dc2626; color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 3px 8px; border-radius: 4px; letter-spacing: .6px;
     }
 
     /* ── Layout ──────────────────────────────────────────────── */
     .layout {
       display: grid;
-      grid-template-columns: 280px 1fr 320px;
-      height: calc(100vh - 57px);
+      grid-template-columns: 260px 1fr 300px;
+      height: calc(100vh - 54px);
     }
 
-    /* ── Sidebar izquierda: escenarios ────────────────────────── */
+    /* ── Sidebar ─────────────────────────────────────────────── */
     .sidebar {
       background: #13151f;
       border-right: 1px solid #2d3147;
       overflow-y: auto;
-      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
     }
-    .sidebar h2 {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 0 20px 12px;
+    .sidebar-top { padding: 18px 16px 8px; }
+    .section-label {
+      font-size: 10px; font-weight: 600; color: #475569;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
     }
     .scenario-btn {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: none;
-      border: none;
-      padding: 12px 20px;
-      color: #94a3b8;
-      font-size: 13.5px;
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; text-align: left;
+      background: none; border: none;
+      padding: 10px 12px;
+      color: #94a3b8; font-size: 13px;
       cursor: pointer;
-      transition: background .15s, color .15s;
+      border-radius: 7px; margin-bottom: 2px;
       border-left: 3px solid transparent;
+      transition: background .14s, color .14s;
     }
     .scenario-btn:hover { background: #1e2130; color: #e2e8f0; }
     .scenario-btn.active {
-      background: #1e2130;
-      color: #f1f5f9;
-      border-left-color: #ef4444;
-      font-weight: 600;
+      background: #1e2130; color: #f1f5f9;
+      border-left-color: #ef4444; font-weight: 600;
     }
-    .scenario-btn .scenario-label {
-      font-size: 11px;
-      color: #475569;
-      margin-top: 2px;
-    }
-    .scenario-btn.active .scenario-label { color: #64748b; }
+    .scenario-btn .s-icon { font-size: 16px; flex-shrink: 0; }
+    .scenario-btn .s-info { display: flex; flex-direction: column; }
+    .scenario-btn .s-name { font-size: 12.5px; }
+    .scenario-btn .s-key  { font-size: 10px; color: #475569; font-family: monospace; margin-top: 1px; }
+    .scenario-btn.active .s-key { color: #64748b; }
 
-    .regenerate-btn {
-      display: block;
-      margin: 16px 16px 0;
-      width: calc(100% - 32px);
-      padding: 9px;
-      background: #1e2130;
-      border: 1px solid #2d3147;
-      border-radius: 7px;
-      color: #94a3b8;
-      font-size: 12.5px;
-      cursor: pointer;
-      transition: background .15s, color .15s;
+    .sidebar-bottom { padding: 12px 16px 16px; margin-top: auto; }
+
+    /* Link editor inside sidebar */
+    .link-editor { padding: 14px 16px; border-top: 1px solid #2d3147; }
+    .link-editor .section-label { margin-bottom: 12px; }
+    .link-field { margin-bottom: 10px; }
+    .link-field label { display: block; font-size: 10.5px; color: #64748b; margin-bottom: 4px; font-family: monospace; }
+    .link-field input {
+      width: 100%; background: #0f1117;
+      border: 1px solid #2d3147; border-radius: 6px;
+      padding: 7px 10px; color: #e2e8f0; font-size: 11.5px;
+      font-family: monospace;
+      outline: none; transition: border-color .15s;
     }
-    .regenerate-btn:hover { background: #252a3a; color: #e2e8f0; }
+    .link-field input:focus { border-color: #3b82f6; }
+    .link-field input::placeholder { color: #334155; }
+
+    .generate-btn {
+      width: 100%; padding: 9px;
+      background: #ef4444; border: none; border-radius: 7px;
+      color: #fff; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      margin-top: 4px;
+    }
+    .generate-btn:hover { background: #dc2626; }
+    .generate-btn:disabled { background: #1e2130; color: #475569; cursor: default; }
+
+    .regen-btn {
+      width: 100%; padding: 8px;
+      background: #1e2130; border: 1px solid #2d3147; border-radius: 7px;
+      color: #94a3b8; font-size: 12px;
+      cursor: pointer; transition: background .15s, color .15s;
+      margin-top: 6px;
+    }
+    .regen-btn:hover { background: #252a3a; color: #e2e8f0; }
 
     /* ── Email panel ─────────────────────────────────────────── */
-    .email-panel {
-      overflow-y: auto;
-      padding: 28px 32px;
-      background: #0f1117;
-    }
+    .email-panel { overflow-y: auto; padding: 24px 28px; background: #0f1117; }
 
     .training-banner {
-      background: #7c1d1d22;
-      border: 1px solid #7f1d1d55;
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 12.5px;
-      color: #fca5a5;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: #7c1d1d22; border: 1px solid #7f1d1d55;
+      border-radius: 8px; padding: 9px 14px;
+      font-size: 12px; color: #fca5a5;
+      margin-bottom: 20px; display: none; align-items: center; gap: 8px;
     }
+    .training-banner.visible { display: flex; }
 
-    /* Email card realista */
-    .email-card {
-      background: #1a1d27;
-      border: 1px solid #2d3147;
-      border-radius: 10px;
-      overflow: hidden;
+    /* AI generation overlay */
+    .ai-overlay {
+      background: #1a1d27; border: 1px solid #2d3147; border-radius: 10px;
+      padding: 32px 28px;
+      display: none; flex-direction: column; gap: 16px;
       max-width: 780px;
     }
-    .email-toolbar {
-      background: #13151f;
-      border-bottom: 1px solid #2d3147;
-      padding: 10px 16px;
-      display: flex;
-      gap: 6px;
+    .ai-overlay.visible { display: flex; }
+    .ai-header {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; color: #64748b;
     }
-    .email-toolbar span {
+    .ai-pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .4; transform: scale(.7); }
+    }
+    .ai-steps { display: flex; flex-direction: column; gap: 10px; }
+    .ai-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12.5px; color: #475569;
+      transition: color .3s;
+    }
+    .ai-step.done { color: #94a3b8; }
+    .ai-step.active { color: #e2e8f0; }
+    .ai-step-icon { width: 18px; text-align: center; }
+    .ai-step.done .ai-step-icon::before { content: "✓"; color: #22c55e; }
+    .ai-step.active .ai-step-icon::before { content: ""; }
+    .ai-step-spin {
       width: 12px; height: 12px;
+      border: 1.5px solid #2d3147; border-top-color: #ef4444;
       border-radius: 50%;
+      animation: spin .7s linear infinite;
     }
-    .dot-r { background: #ef4444; }
-    .dot-y { background: #f59e0b; }
-    .dot-g { background: #22c55e; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ai-step.pending .ai-step-icon::before { content: "·"; color: #334155; }
 
-    .email-header {
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid #2d3147;
+    /* Typing preview */
+    .ai-preview {
+      background: #13151f; border-radius: 6px;
+      padding: 14px 16px; font-size: 12px; font-family: monospace;
+      color: #64748b; line-height: 1.7; min-height: 60px;
+      white-space: pre-wrap; overflow: hidden;
     }
-    .email-subject {
-      font-size: 17px;
-      font-weight: 600;
-      color: #f1f5f9;
-      margin-bottom: 14px;
-      line-height: 1.4;
+    .ai-cursor {
+      display: inline-block; width: 1px; height: 13px;
+      background: #ef4444; margin-left: 1px;
+      animation: blink .6s step-end infinite; vertical-align: text-bottom;
     }
-    .email-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Email card */
+    .email-card {
+      background: #1a1d27; border: 1px solid #2d3147;
+      border-radius: 10px; overflow: hidden;
+      max-width: 780px; display: none;
     }
-    .email-meta-row {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      font-size: 13px;
+    .email-card.visible { display: block; }
+    .email-toolbar {
+      background: #13151f; border-bottom: 1px solid #2d3147;
+      padding: 10px 16px; display: flex; gap: 6px;
     }
-    .meta-label { color: #475569; min-width: 48px; }
-    .meta-from {
-      display: flex;
-      flex-direction: column;
-    }
+    .email-toolbar span { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ef4444; } .dot-y { background: #f59e0b; } .dot-g { background: #22c55e; }
+
+    .email-header { padding: 20px 24px 16px; border-bottom: 1px solid #2d3147; }
+    .email-subject { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; line-height: 1.4; }
+    .email-meta-row { display: flex; align-items: baseline; gap: 8px; font-size: 13px; margin-bottom: 3px; }
+    .meta-label { color: #475569; min-width: 44px; }
     .meta-name { color: #e2e8f0; font-weight: 500; }
-    .meta-addr {
-      color: #64748b;
-      font-size: 12px;
-      font-family: monospace;
-    }
-    .meta-addr.suspicious {
-      color: #f87171;
-      background: #7f1d1d22;
-      padding: 1px 5px;
-      border-radius: 3px;
-    }
+    .meta-addr { color: #f87171; font-size: 11.5px; font-family: monospace; background: #7f1d1d22; padding: 1px 5px; border-radius: 3px; }
 
     .email-body {
-      padding: 24px;
-      font-size: 14px;
-      line-height: 1.75;
-      color: #cbd5e1;
-      white-space: pre-wrap;
-      font-family: inherit;
+      padding: 22px 24px; font-size: 13.5px; line-height: 1.8;
+      color: #cbd5e1; white-space: pre-wrap; font-family: inherit;
     }
-    .email-body a {
-      color: #60a5fa;
-      text-decoration: underline;
-    }
-    .email-body .link-suspicious {
-      color: #f87171;
-      background: #7f1d1d22;
-      padding: 1px 3px;
-      border-radius: 3px;
+    .email-body .highlight-link {
+      color: #f87171; background: #7f1d1d22;
+      padding: 1px 4px; border-radius: 3px; font-family: monospace; font-size: 12px;
     }
 
-    /* Estado vacío */
+    /* Empty state */
     .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 70%;
-      gap: 12px;
-      color: #334155;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 70%; gap: 12px; color: #334155;
     }
-    .empty-state .icon { font-size: 48px; }
-    .empty-state p { font-size: 14px; }
+    .empty-state .icon { font-size: 44px; }
+    .empty-state p { font-size: 13px; }
 
-    /* ── Panel derecha: red flags ─────────────────────────────── */
+    /* ── Flags panel ─────────────────────────────────────────── */
     .flags-panel {
-      background: #13151f;
-      border-left: 1px solid #2d3147;
-      overflow-y: auto;
-      padding: 20px 16px;
+      background: #13151f; border-left: 1px solid #2d3147;
+      overflow-y: auto; padding: 18px 14px;
     }
-    .flags-panel h2 {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
+
+    .score-box {
+      background: #1a1d27; border: 1px solid #2d3147;
+      border-radius: 8px; padding: 14px; margin-bottom: 14px;
+      display: none;
     }
+    .score-box.visible { display: block; }
+    .score-box .section-label { margin-bottom: 8px; }
+    .score-number { font-size: 24px; font-weight: 700; color: #f87171; }
+    .score-number span { font-size: 13px; color: #475569; font-weight: 400; }
+    .score-track { height: 5px; background: #0f1117; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+    .score-fill { height: 100%; background: linear-gradient(90deg,#f59e0b,#ef4444); border-radius: 99px; transition: width .5s ease; }
 
     .flag-card {
-      background: #1a1d27;
-      border: 1px solid #2d3147;
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
+      background: #1a1d27; border: 1px solid #2d3147;
+      border-radius: 8px; padding: 11px 13px; margin-bottom: 8px;
       border-left: 3px solid transparent;
     }
     .flag-card.alta  { border-left-color: #ef4444; }
     .flag-card.media { border-left-color: #f59e0b; }
     .flag-card.baja  { border-left-color: #22c55e; }
+    .flag-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .flag-sev {
+      font-size: 9.5px; font-weight: 700; letter-spacing: .6px;
+      padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
+    }
+    .alta  .flag-sev { background: #7f1d1d33; color: #fca5a5; }
+    .media .flag-sev { background: #78350f33; color: #fcd34d; }
+    .baja  .flag-sev { background: #14532d33; color: #86efac; }
+    .flag-elem { font-size: 11.5px; font-weight: 600; color: #94a3b8; font-family: monospace; }
+    .flag-desc { font-size: 12px; color: #94a3b8; line-height: 1.5; }
 
-    .flag-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-    .flag-severity {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .6px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      text-transform: uppercase;
-    }
-    .alta  .flag-severity { background: #7f1d1d33; color: #fca5a5; }
-    .media .flag-severity { background: #78350f33; color: #fcd34d; }
-    .baja  .flag-severity { background: #14532d33; color: #86efac; }
-
-    .flag-element {
-      font-size: 12px;
-      font-weight: 600;
-      color: #94a3b8;
-      font-family: monospace;
-    }
-    .flag-desc {
-      font-size: 12.5px;
-      color: #94a3b8;
-      line-height: 1.5;
-    }
-
-    .score-bar {
-      background: #1a1d27;
-      border: 1px solid #2d3147;
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-    .score-label {
-      font-size: 11px;
-      color: #64748b;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    .score-numbers {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f87171;
-      margin-bottom: 10px;
-    }
-    .score-numbers span { font-size: 13px; color: #475569; font-weight: 400; }
-    .score-track {
-      height: 6px;
-      background: #0f1117;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .score-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #ef4444);
-      border-radius: 99px;
-      transition: width .5s ease;
-    }
-
-    /* Loader */
-    .loader {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-      color: #475569;
-      font-size: 14px;
-      gap: 10px;
-    }
-    .loader.visible { display: flex; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid #2d3147;
-      border-top-color: #ef4444;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
+    .no-flags { color: #334155; font-size: 12.5px; margin-top: 18px; text-align: center; }
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Phishing Trainer</div>
-  <div class="badge">ENTRENAMIENTO</div>
+  <div class="badge">TRAINING ONLY</div>
 </header>
 
 <div class="layout">
 
-  <!-- Sidebar escenarios -->
+  <!-- ── Sidebar ── -->
   <aside class="sidebar">
-    <h2>Escenarios</h2>
-    <div id="scenario-list"></div>
-    <button class="regenerate-btn" id="regen-btn" style="display:none">
-      ↻ Regenerar variante
-    </button>
+    <div class="sidebar-top">
+      <div class="section-label">Scenarios</div>
+      <div id="scenario-list"></div>
+    </div>
+
+    <div class="link-editor" id="link-editor" style="display:none">
+      <div class="section-label">Customize Links</div>
+      <div id="link-fields"></div>
+      <button class="generate-btn" id="generate-btn">Generate Email</button>
+      <button class="regen-btn" id="regen-btn">↻ Regenerate variant</button>
+    </div>
   </aside>
 
-  <!-- Email -->
+  <!-- ── Email panel ── -->
   <main class="email-panel">
-    <div class="training-banner" id="banner" style="display:none">
-      ⚠️ <strong>Simulación de phishing</strong> — Este email es falso y fue generado con fines de entrenamiento. No fue enviado a ningún destinatario real.
+    <div class="training-banner" id="banner">
+      ⚠️ <strong>Phishing simulation</strong> — This email is fake and was generated for security awareness training. No real recipient was contacted.
     </div>
-    <div id="empty-state" class="empty-state">
+
+    <div class="empty-state" id="empty-state">
       <div class="icon">📧</div>
-      <p>Selecciona un escenario para ver el email simulado</p>
+      <p>Select a scenario to preview the simulated email</p>
     </div>
-    <div id="loader" class="loader">
-      <div class="spinner"></div> Generando...
+
+    <!-- AI generation animation -->
+    <div class="ai-overlay" id="ai-overlay">
+      <div class="ai-header">
+        <div class="ai-pulse"></div>
+        <span id="ai-label">AI is crafting the phishing email…</span>
+      </div>
+      <div class="ai-steps" id="ai-steps"></div>
+      <div class="ai-preview" id="ai-preview"><span class="ai-cursor"></span></div>
     </div>
-    <div id="email-view" style="display:none">
-      <div class="email-card">
-        <div class="email-toolbar">
-          <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
-        </div>
-        <div class="email-header">
-          <div class="email-subject" id="e-subject"></div>
-          <div class="email-meta">
-            <div class="email-meta-row">
-              <span class="meta-label">De</span>
-              <div class="meta-from">
-                <span class="meta-name" id="e-name"></span>
-                <span class="meta-addr" id="e-addr"></span>
-              </div>
-            </div>
+
+    <!-- Real email card -->
+    <div class="email-card" id="email-card">
+      <div class="email-toolbar">
+        <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <div class="email-header">
+        <div class="email-subject" id="e-subject"></div>
+        <div>
+          <div class="email-meta-row">
+            <span class="meta-label">From</span>
+            <span class="meta-name" id="e-name"></span>
+          </div>
+          <div class="email-meta-row">
+            <span class="meta-label"></span>
+            <span class="meta-addr" id="e-addr"></span>
           </div>
         </div>
-        <pre class="email-body" id="e-body"></pre>
       </div>
+      <div class="email-body" id="e-body"></div>
     </div>
   </main>
 
-  <!-- Red flags -->
+  <!-- ── Flags panel ── -->
   <aside class="flags-panel">
-    <div class="score-bar" id="score-bar" style="display:none">
-      <div class="score-label">Señales de alerta detectadas</div>
-      <div class="score-numbers" id="score-num">0 <span>señales</span></div>
+    <div class="score-box" id="score-box">
+      <div class="section-label">Red Flags Detected</div>
+      <div class="score-number" id="score-num">0 <span>flags</span></div>
       <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
     </div>
-    <h2>Análisis educativo</h2>
-    <div id="flags-list">
-      <div style="color:#334155;font-size:13px;margin-top:20px;text-align:center">
-        Selecciona un escenario
-      </div>
-    </div>
+    <div class="section-label" style="margin-bottom:10px">Educational Analysis</div>
+    <div id="flags-list"><div class="no-flags">Select a scenario to begin</div></div>
   </aside>
 
 </div>
 
 <script>
 const LABELS = {
-  banco_urgente:          { name: "Banco — Cuenta suspendida",    icon: "🏦" },
-  it_soporte_credenciales:{ name: "IT Helpdesk — Contraseña",     icon: "💻" },
-  paquete_entrega:        { name: "Correos — Paquete retenido",   icon: "📦" },
-  microsoft_cuenta:       { name: "Microsoft — Acceso sospechoso",icon: "🪟" },
-  rrhh_nomina:            { name: "RRHH — Datos bancarios",       icon: "💼" },
-  vpn_acceso_caducado:    { name: "VPN — Credenciales caducadas", icon: "🔐" },
+  banco_urgente:           { name: "Bank — Account suspended",       icon: "🏦" },
+  it_soporte_credenciales: { name: "IT Helpdesk — Password reset",   icon: "💻" },
+  paquete_entrega:         { name: "Delivery — Package held",        icon: "📦" },
+  microsoft_cuenta:        { name: "Microsoft — Suspicious login",   icon: "🪟" },
+  vpn_acceso_caducado:     { name: "VPN — Credentials expired",      icon: "🔐" },
+  rrhh_nomina:             { name: "HR — Banking data update",       icon: "💼" },
 };
 
-let current = null;
+const AI_STEPS = [
+  "Selecting scenario template",
+  "Personalising sender identity",
+  "Injecting urgency triggers",
+  "Embedding custom links",
+  "Rendering email body",
+];
 
+let current = null;
+let customLinks = {};   // current custom link values
+
+// ── Fetch scenarios and build sidebar ──────────────────────────
 async function loadScenarios() {
-  const res = await fetch("/api/scenarios");
-  const list = await res.json();
+  const list = await fetch("/api/scenarios").then(r => r.json());
   const container = document.getElementById("scenario-list");
   list.forEach(s => {
+    const info = LABELS[s] || { name: s, icon: "📧" };
     const btn = document.createElement("button");
     btn.className = "scenario-btn";
-    const info = LABELS[s] || { name: s, icon: "📧" };
-    btn.innerHTML = `${info.icon} ${info.name}<div class="scenario-label">${s}</div>`;
     btn.dataset.scenario = s;
-    btn.onclick = () => loadScenario(s);
+    btn.innerHTML = `
+      <span class="s-icon">${info.icon}</span>
+      <span class="s-info">
+        <span class="s-name">${info.name}</span>
+        <span class="s-key">${s}</span>
+      </span>`;
+    btn.onclick = () => selectScenario(s);
     container.appendChild(btn);
   });
 }
 
-async function loadScenario(scenario) {
+// ── Select scenario: load default links, show editor ──────────
+async function selectScenario(scenario) {
   current = scenario;
-
-  // UI state
   document.querySelectorAll(".scenario-btn").forEach(b =>
     b.classList.toggle("active", b.dataset.scenario === scenario)
   );
+
+  // Fetch default links for this scenario
+  const defaults = await fetch(`/api/scenario/${scenario}/links`).then(r => r.json());
+
+  // Build link editor
+  const editor = document.getElementById("link-editor");
+  const fields = document.getElementById("link-fields");
+  fields.innerHTML = "";
+  customLinks = { ...defaults };
+
+  if (Object.keys(defaults).length === 0) {
+    editor.style.display = "none";
+  } else {
+    editor.style.display = "block";
+    Object.entries(defaults).forEach(([key, defaultUrl]) => {
+      const div = document.createElement("div");
+      div.className = "link-field";
+      div.innerHTML = `<label>{${key}}</label>
+        <input type="url" placeholder="${defaultUrl}" value="${defaultUrl}" data-key="${key}" />`;
+      div.querySelector("input").addEventListener("input", e => {
+        customLinks[key] = e.target.value || defaultUrl;
+      });
+      fields.appendChild(div);
+    });
+  }
+
+  // Auto-generate on scenario selection
+  generateEmail();
+}
+
+// ── Generate with AI animation ─────────────────────────────────
+async function generateEmail() {
+  if (!current) return;
+
+  // Hide final card, show overlay
   document.getElementById("empty-state").style.display = "none";
-  document.getElementById("email-view").style.display = "none";
-  document.getElementById("banner").style.display = "none";
-  document.getElementById("score-bar").style.display = "none";
-  document.getElementById("loader").classList.add("visible");
-  document.getElementById("regen-btn").style.display = "block";
+  document.getElementById("email-card").classList.remove("visible");
+  document.getElementById("banner").classList.remove("visible");
+  document.getElementById("score-box").classList.remove("visible");
   document.getElementById("flags-list").innerHTML = "";
 
-  const res = await fetch(`/api/generate/${scenario}`);
-  const data = await res.json();
+  const overlay = document.getElementById("ai-overlay");
+  overlay.classList.add("visible");
 
-  document.getElementById("loader").classList.remove("visible");
+  // Build step elements
+  const stepsEl = document.getElementById("ai-steps");
+  stepsEl.innerHTML = "";
+  const stepEls = AI_STEPS.map((label, i) => {
+    const div = document.createElement("div");
+    div.className = "ai-step pending";
+    div.innerHTML = `<span class="ai-step-icon"></span><span>${label}</span>`;
+    stepsEl.appendChild(div);
+    return div;
+  });
 
-  // Email
+  const preview = document.getElementById("ai-preview");
+  preview.innerHTML = '<span class="ai-cursor"></span>';
+
+  // Fetch real data first (we'll animate while pretending to wait)
+  const fetchPromise = fetch(`/api/generate/${current}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ links: customLinks }),
+  }).then(r => r.json());
+
+  // Animate steps sequentially
+  const STEP_DELAY = 420;
+  for (let i = 0; i < stepEls.length; i++) {
+    stepEls[i].className = "ai-step active";
+    // Replace placeholder icon with spinner
+    stepEls[i].querySelector(".ai-step-icon").innerHTML =
+      '<span class="ai-step-spin"></span>';
+    await sleep(STEP_DELAY);
+    stepEls[i].className = "ai-step done";
+    stepEls[i].querySelector(".ai-step-icon").innerHTML = "";
+  }
+
+  // Get real data
+  const data = await fetchPromise;
+
+  // Typewriter effect on email body
+  document.getElementById("ai-label").textContent = "Writing email body…";
+  const fullBody = data.email.body;
+  const charsPerTick = 3;
+  let typed = "";
+  for (let i = 0; i < fullBody.length; i += charsPerTick) {
+    typed += fullBody.slice(i, i + charsPerTick);
+    preview.innerHTML = escapeHtml(typed) + '<span class="ai-cursor"></span>';
+    preview.scrollTop = preview.scrollHeight;
+    await sleep(18);
+  }
+
+  await sleep(300);
+
+  // Hide overlay, show real card
+  overlay.classList.remove("visible");
+  renderEmail(data);
+}
+
+function renderEmail(data) {
   const e = data.email;
+
   document.getElementById("e-subject").textContent = e.subject;
   document.getElementById("e-name").textContent = e.from_display;
+  document.getElementById("e-addr").textContent = e.from_email;
 
-  const addrEl = document.getElementById("e-addr");
-  addrEl.textContent = e.from_email;
-  // Marcar dirección sospechosa si el dominio no es estándar
-  addrEl.className = "meta-addr suspicious";
+  // Highlight links in body
+  let bodyHtml = escapeHtml(e.body);
+  const urlRe = /https?:\/\/[^\s]+/g;
+  bodyHtml = bodyHtml.replace(urlRe, m =>
+    `<span class="highlight-link">${m}</span>`
+  );
+  document.getElementById("e-body").innerHTML = bodyHtml;
 
-  document.getElementById("e-body").textContent = e.body;
-  document.getElementById("email-view").style.display = "block";
-  document.getElementById("banner").style.display = "flex";
+  document.getElementById("email-card").classList.add("visible");
+  document.getElementById("banner").classList.add("visible");
 
   // Score
   const total = data.training.total_red_flags;
-  const maxExpected = 8;
-  const pct = Math.min(100, Math.round((total / maxExpected) * 100));
   document.getElementById("score-num").innerHTML =
-    `${total} <span>señale${total !== 1 ? "s" : ""}</span>`;
-  document.getElementById("score-fill").style.width = pct + "%";
-  document.getElementById("score-bar").style.display = "block";
+    `${total} <span>flag${total !== 1 ? "s" : ""}</span>`;
+  document.getElementById("score-fill").style.width =
+    Math.min(100, Math.round(total / 8 * 100)) + "%";
+  document.getElementById("score-box").classList.add("visible");
 
   // Flags
-  const container = document.getElementById("flags-list");
+  const list = document.getElementById("flags-list");
+  list.innerHTML = "";
   data.training.red_flags.forEach(rf => {
-    const icons = { alta: "🔴", media: "🟡", baja: "🟢" };
     const card = document.createElement("div");
     card.className = `flag-card ${rf.severidad}`;
     card.innerHTML = `
       <div class="flag-top">
-        <span class="flag-severity">${rf.severidad}</span>
-        <span class="flag-element">${rf.elemento}</span>
+        <span class="flag-sev">${rf.severidad}</span>
+        <span class="flag-elem">${rf.elemento}</span>
       </div>
-      <div class="flag-desc">${rf.descripcion}</div>
-    `;
-    container.appendChild(card);
+      <div class="flag-desc">${escapeHtml(rf.descripcion)}</div>`;
+    list.appendChild(card);
   });
 }
 
-document.getElementById("regen-btn").onclick = () => {
-  if (current) loadScenario(current);
-};
+function escapeHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+document.getElementById("generate-btn").onclick = generateEmail;
+document.getElementById("regen-btn").onclick = generateEmail;
 
 loadScenarios();
 </script>
