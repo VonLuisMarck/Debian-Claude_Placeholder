@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phishing Trainer</title>
+  <title>MailForge</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,7 +14,7 @@
       min-height: 100vh;
     }
 
-    /* ── Header ─────────────────────────────────────────────── */
+    /* ── Header ── */
     header {
       background: #1a1d27;
       border-bottom: 1px solid #2d3147;
@@ -25,20 +25,16 @@
       gap: 14px;
     }
     .logo { font-size: 18px; font-weight: 700; color: #f8fafc; letter-spacing: -.3px; }
-    .badge {
-      background: #dc2626; color: #fff;
-      font-size: 10px; font-weight: 700;
-      padding: 3px 8px; border-radius: 4px; letter-spacing: .6px;
-    }
+    .logo span { color: #ef4444; }
 
-    /* ── Layout ──────────────────────────────────────────────── */
+    /* ── Layout ── */
     .layout {
       display: grid;
-      grid-template-columns: 260px 1fr 300px;
+      grid-template-columns: 260px 1fr;
       height: calc(100vh - 54px);
     }
 
-    /* ── Sidebar ─────────────────────────────────────────────── */
+    /* ── Sidebar ── */
     .sidebar {
       background: #13151f;
       border-right: 1px solid #2d3147;
@@ -46,7 +42,7 @@
       display: flex;
       flex-direction: column;
     }
-    .sidebar-top { padding: 18px 16px 8px; }
+    .sidebar-top { padding: 18px 16px 8px; flex: 1; }
     .section-label {
       font-size: 10px; font-weight: 600; color: #475569;
       letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
@@ -73,52 +69,21 @@
     .scenario-btn .s-key  { font-size: 10px; color: #475569; font-family: monospace; margin-top: 1px; }
     .scenario-btn.active .s-key { color: #64748b; }
 
-    .sidebar-bottom { padding: 12px 16px 16px; margin-top: auto; }
-
-    /* Link editor inside sidebar */
-    .link-editor { padding: 14px 16px; border-top: 1px solid #2d3147; }
-    .link-editor .section-label { margin-bottom: 12px; }
-    .link-field { margin-bottom: 10px; }
-    .link-field label { display: block; font-size: 10.5px; color: #64748b; margin-bottom: 4px; font-family: monospace; }
-    .link-field input {
-      width: 100%; background: #0f1117;
-      border: 1px solid #2d3147; border-radius: 6px;
-      padding: 7px 10px; color: #e2e8f0; font-size: 11.5px;
-      font-family: monospace;
-      outline: none; transition: border-color .15s;
+    .sidebar-footer {
+      padding: 12px 16px 16px;
+      border-top: 1px solid #2d3147;
     }
-    .link-field input:focus { border-color: #3b82f6; }
-    .link-field input::placeholder { color: #334155; }
-
-    .generate-btn {
-      width: 100%; padding: 9px;
-      background: #ef4444; border: none; border-radius: 7px;
-      color: #fff; font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: background .15s;
-      margin-top: 4px;
-    }
-    .generate-btn:hover { background: #dc2626; }
-    .generate-btn:disabled { background: #1e2130; color: #475569; cursor: default; }
-
     .regen-btn {
       width: 100%; padding: 8px;
       background: #1e2130; border: 1px solid #2d3147; border-radius: 7px;
       color: #94a3b8; font-size: 12px;
       cursor: pointer; transition: background .15s, color .15s;
-      margin-top: 6px;
     }
-    .regen-btn:hover { background: #252a3a; color: #e2e8f0; }
+    .regen-btn:hover:not(:disabled) { background: #252a3a; color: #e2e8f0; }
+    .regen-btn:disabled { opacity: .4; cursor: default; }
 
-    /* ── Email panel ─────────────────────────────────────────── */
+    /* ── Email panel ── */
     .email-panel { overflow-y: auto; padding: 24px 28px; background: #0f1117; }
-
-    .training-banner {
-      background: #7c1d1d22; border: 1px solid #7f1d1d55;
-      border-radius: 8px; padding: 9px 14px;
-      font-size: 12px; color: #fca5a5;
-      margin-bottom: 20px; display: none; align-items: center; gap: 8px;
-    }
-    .training-banner.visible { display: flex; }
 
     /* AI generation overlay */
     .ai-overlay {
@@ -128,82 +93,29 @@
       max-width: 780px;
     }
     .ai-overlay.visible { display: flex; }
-    .ai-header {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 13px; color: #64748b;
-    }
+    .ai-header { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #64748b; }
     .ai-pulse {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #ef4444;
+      width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
       animation: pulse 1s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: .4; transform: scale(.7); }
-    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
     .ai-steps { display: flex; flex-direction: column; gap: 10px; }
-    .ai-step {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 12.5px; color: #475569;
-      transition: color .3s;
-    }
-    .ai-step.done { color: #94a3b8; }
+    .ai-step { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #475569; transition: color .3s; }
+    .ai-step.done   { color: #94a3b8; }
     .ai-step.active { color: #e2e8f0; }
     .ai-step-icon { width: 18px; text-align: center; }
-    .ai-step.done .ai-step-icon::before { content: "✓"; color: #22c55e; }
-    .ai-step.active .ai-step-icon::before { content: ""; }
-    .ai-step-spin {
-      width: 12px; height: 12px;
-      border: 1.5px solid #2d3147; border-top-color: #ef4444;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .ai-step.done    .ai-step-icon::before { content: "✓"; color: #22c55e; }
     .ai-step.pending .ai-step-icon::before { content: "·"; color: #334155; }
-
-    /* Typing preview */
+    .ai-step-spin { width:12px;height:12px;border:1.5px solid #2d3147;border-top-color:#ef4444;border-radius:50%;animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .ai-preview {
       background: #13151f; border-radius: 6px;
       padding: 14px 16px; font-size: 12px; font-family: monospace;
       color: #64748b; line-height: 1.7; min-height: 60px;
-      white-space: pre-wrap; overflow: hidden;
+      white-space: pre-wrap;
     }
-    .ai-cursor {
-      display: inline-block; width: 1px; height: 13px;
-      background: #ef4444; margin-left: 1px;
-      animation: blink .6s step-end infinite; vertical-align: text-bottom;
-    }
+    .ai-cursor { display:inline-block;width:1px;height:13px;background:#ef4444;margin-left:1px;animation:blink .6s step-end infinite;vertical-align:text-bottom; }
     @keyframes blink { 50% { opacity: 0; } }
-
-    /* Email card */
-    .email-card {
-      background: #1a1d27; border: 1px solid #2d3147;
-      border-radius: 10px; overflow: hidden;
-      max-width: 780px; display: none;
-    }
-    .email-card.visible { display: block; }
-    .email-toolbar {
-      background: #13151f; border-bottom: 1px solid #2d3147;
-      padding: 10px 16px; display: flex; gap: 6px;
-    }
-    .email-toolbar span { width: 12px; height: 12px; border-radius: 50%; }
-    .dot-r { background: #ef4444; } .dot-y { background: #f59e0b; } .dot-g { background: #22c55e; }
-
-    .email-header { padding: 20px 24px 16px; border-bottom: 1px solid #2d3147; }
-    .email-subject { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; line-height: 1.4; }
-    .email-meta-row { display: flex; align-items: baseline; gap: 8px; font-size: 13px; margin-bottom: 3px; }
-    .meta-label { color: #475569; min-width: 44px; }
-    .meta-name { color: #e2e8f0; font-weight: 500; }
-    .meta-addr { color: #f87171; font-size: 11.5px; font-family: monospace; background: #7f1d1d22; padding: 1px 5px; border-radius: 3px; }
-
-    .email-body {
-      padding: 22px 24px; font-size: 13.5px; line-height: 1.8;
-      color: #cbd5e1; white-space: pre-wrap; font-family: inherit;
-    }
-    .email-body .highlight-link {
-      color: #f87171; background: #7f1d1d22;
-      padding: 1px 4px; border-radius: 3px; font-family: monospace; font-size: 12px;
-    }
 
     /* Empty state */
     .empty-state {
@@ -214,51 +126,53 @@
     .empty-state .icon { font-size: 44px; }
     .empty-state p { font-size: 13px; }
 
-    /* ── Flags panel ─────────────────────────────────────────── */
-    .flags-panel {
-      background: #13151f; border-left: 1px solid #2d3147;
-      overflow-y: auto; padding: 18px 14px;
-    }
+    /* Email wrapper */
+    #email-wrapper { display: none; max-width: 780px; }
+    #email-wrapper.visible { display: block; }
 
-    .score-box {
+    /* Toolbar above email */
+    .email-actions {
+      display: flex; justify-content: flex-end;
+      margin-bottom: 10px; gap: 8px;
+    }
+    .open-html-btn {
+      padding: 7px 14px;
+      background: #1e2130; border: 1px solid #2d3147; border-radius: 7px;
+      color: #94a3b8; font-size: 12px;
+      cursor: pointer; transition: background .15s, color .15s;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .open-html-btn:hover { background: #252a3a; color: #e2e8f0; }
+
+    /* Email card */
+    .email-card {
       background: #1a1d27; border: 1px solid #2d3147;
-      border-radius: 8px; padding: 14px; margin-bottom: 14px;
-      display: none;
+      border-radius: 10px; overflow: hidden;
     }
-    .score-box.visible { display: block; }
-    .score-box .section-label { margin-bottom: 8px; }
-    .score-number { font-size: 24px; font-weight: 700; color: #f87171; }
-    .score-number span { font-size: 13px; color: #475569; font-weight: 400; }
-    .score-track { height: 5px; background: #0f1117; border-radius: 99px; overflow: hidden; margin-top: 10px; }
-    .score-fill { height: 100%; background: linear-gradient(90deg,#f59e0b,#ef4444); border-radius: 99px; transition: width .5s ease; }
-
-    .flag-card {
-      background: #1a1d27; border: 1px solid #2d3147;
-      border-radius: 8px; padding: 11px 13px; margin-bottom: 8px;
-      border-left: 3px solid transparent;
+    .email-toolbar {
+      background: #13151f; border-bottom: 1px solid #2d3147;
+      padding: 10px 16px; display: flex; gap: 6px;
     }
-    .flag-card.alta  { border-left-color: #ef4444; }
-    .flag-card.media { border-left-color: #f59e0b; }
-    .flag-card.baja  { border-left-color: #22c55e; }
-    .flag-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-    .flag-sev {
-      font-size: 9.5px; font-weight: 700; letter-spacing: .6px;
-      padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
+    .email-toolbar span { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r{background:#ef4444} .dot-y{background:#f59e0b} .dot-g{background:#22c55e}
+    .email-header { padding: 20px 24px 16px; border-bottom: 1px solid #2d3147; }
+    .email-subject { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; line-height: 1.4; }
+    .email-meta-row { display: flex; align-items: baseline; gap: 8px; font-size: 13px; margin-bottom: 3px; }
+    .meta-label { color: #475569; min-width: 44px; }
+    .meta-name  { color: #e2e8f0; font-weight: 500; }
+    .meta-addr  { color: #94a3b8; font-size: 11.5px; font-family: monospace; background: #1e2130; padding: 1px 5px; border-radius: 3px; }
+    .email-body {
+      padding: 22px 24px; font-size: 13.5px; line-height: 1.8;
+      color: #cbd5e1; white-space: pre-wrap;
     }
-    .alta  .flag-sev { background: #7f1d1d33; color: #fca5a5; }
-    .media .flag-sev { background: #78350f33; color: #fcd34d; }
-    .baja  .flag-sev { background: #14532d33; color: #86efac; }
-    .flag-elem { font-size: 11.5px; font-weight: 600; color: #94a3b8; font-family: monospace; }
-    .flag-desc { font-size: 12px; color: #94a3b8; line-height: 1.5; }
-
-    .no-flags { color: #334155; font-size: 12.5px; margin-top: 18px; text-align: center; }
+    .email-body a { color: #60a5fa; text-decoration: none; }
+    .email-body a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Phishing Trainer</div>
-  <div class="badge">TRAINING ONLY</div>
+  <div class="logo">Mail<span>Forge</span></div>
 </header>
 
 <div class="layout">
@@ -266,96 +180,80 @@
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-top">
-      <div class="section-label">Scenarios</div>
+      <div class="section-label">Escenarios</div>
       <div id="scenario-list"></div>
     </div>
-
-    <div class="link-editor" id="link-editor" style="display:none">
-      <div class="section-label">Customize Links</div>
-      <div id="link-fields"></div>
-      <button class="generate-btn" id="generate-btn">Generate Email</button>
-      <button class="regen-btn" id="regen-btn">↻ Regenerate variant</button>
+    <div class="sidebar-footer">
+      <button class="regen-btn" id="regen-btn" disabled>↻ Regenerar variante</button>
     </div>
   </aside>
 
   <!-- ── Email panel ── -->
   <main class="email-panel">
-    <div class="training-banner" id="banner">
-      ⚠️ <strong>Phishing simulation</strong> — This email is fake and was generated for security awareness training. No real recipient was contacted.
-    </div>
 
     <div class="empty-state" id="empty-state">
-      <div class="icon">📧</div>
-      <p>Select a scenario to preview the simulated email</p>
+      <div class="icon">✉</div>
+      <p>Selecciona un escenario para generar el email</p>
     </div>
 
-    <!-- AI generation animation -->
     <div class="ai-overlay" id="ai-overlay">
       <div class="ai-header">
         <div class="ai-pulse"></div>
-        <span id="ai-label">AI is crafting the phishing email…</span>
+        <span id="ai-label">Generando email…</span>
       </div>
       <div class="ai-steps" id="ai-steps"></div>
       <div class="ai-preview" id="ai-preview"><span class="ai-cursor"></span></div>
     </div>
 
-    <!-- Real email card -->
-    <div class="email-card" id="email-card">
-      <div class="email-toolbar">
-        <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+    <div id="email-wrapper">
+      <div class="email-actions">
+        <button class="open-html-btn" id="open-html-btn">↗ Abrir como HTML</button>
       </div>
-      <div class="email-header">
-        <div class="email-subject" id="e-subject"></div>
-        <div>
-          <div class="email-meta-row">
-            <span class="meta-label">From</span>
-            <span class="meta-name" id="e-name"></span>
-          </div>
-          <div class="email-meta-row">
-            <span class="meta-label"></span>
-            <span class="meta-addr" id="e-addr"></span>
+      <div class="email-card">
+        <div class="email-toolbar">
+          <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+        </div>
+        <div class="email-header">
+          <div class="email-subject" id="e-subject"></div>
+          <div>
+            <div class="email-meta-row">
+              <span class="meta-label">De</span>
+              <span class="meta-name" id="e-name"></span>
+            </div>
+            <div class="email-meta-row">
+              <span class="meta-label"></span>
+              <span class="meta-addr" id="e-addr"></span>
+            </div>
           </div>
         </div>
+        <div class="email-body" id="e-body"></div>
       </div>
-      <div class="email-body" id="e-body"></div>
     </div>
+
   </main>
-
-  <!-- ── Flags panel ── -->
-  <aside class="flags-panel">
-    <div class="score-box" id="score-box">
-      <div class="section-label">Red Flags Detected</div>
-      <div class="score-number" id="score-num">0 <span>flags</span></div>
-      <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
-    </div>
-    <div class="section-label" style="margin-bottom:10px">Educational Analysis</div>
-    <div id="flags-list"><div class="no-flags">Select a scenario to begin</div></div>
-  </aside>
-
 </div>
 
 <script>
 const LABELS = {
-  banco_urgente:           { name: "Bank — Account suspended",       icon: "🏦" },
-  it_soporte_credenciales: { name: "IT Helpdesk — Password reset",   icon: "💻" },
-  paquete_entrega:         { name: "Delivery — Package held",        icon: "📦" },
-  microsoft_cuenta:        { name: "Microsoft — Suspicious login",   icon: "🪟" },
-  vpn_acceso_caducado:     { name: "VPN — Credentials expired",      icon: "🔐" },
-  rrhh_nomina:             { name: "HR — Banking data update",       icon: "💼" },
+  banco_urgente:           { name: "Banco — Cuenta suspendida",       icon: "🏦" },
+  it_soporte_credenciales: { name: "IT Helpdesk — Contraseña",        icon: "💻" },
+  paquete_entrega:         { name: "Correos — Paquete retenido",      icon: "📦" },
+  microsoft_cuenta:        { name: "Microsoft — Acceso sospechoso",   icon: "🪟" },
+  vpn_acceso_caducado:     { name: "VPN — Credenciales caducadas",    icon: "🔐" },
+  rrhh_nomina:             { name: "RRHH — Datos bancarios nómina",   icon: "💼" },
 };
 
 const AI_STEPS = [
-  "Selecting scenario template",
-  "Personalising sender identity",
-  "Injecting urgency triggers",
-  "Embedding custom links",
-  "Rendering email body",
+  "Seleccionando plantilla",
+  "Personalizando remitente",
+  "Inyectando variables",
+  "Insertando enlace",
+  "Renderizando cuerpo",
 ];
 
 let current = null;
-let customLinks = {};   // current custom link values
+let lastData = null;
 
-// ── Fetch scenarios and build sidebar ──────────────────────────
 async function loadScenarios() {
   const list = await fetch("/api/scenarios").then(r => r.json());
   const container = document.getElementById("scenario-list");
@@ -375,60 +273,28 @@ async function loadScenarios() {
   });
 }
 
-// ── Select scenario: load default links, show editor ──────────
-async function selectScenario(scenario) {
+function selectScenario(scenario) {
   current = scenario;
   document.querySelectorAll(".scenario-btn").forEach(b =>
     b.classList.toggle("active", b.dataset.scenario === scenario)
   );
-
-  // Fetch default links for this scenario
-  const defaults = await fetch(`/api/scenario/${scenario}/links`).then(r => r.json());
-
-  // Build link editor
-  const editor = document.getElementById("link-editor");
-  const fields = document.getElementById("link-fields");
-  fields.innerHTML = "";
-  customLinks = { ...defaults };
-
-  if (Object.keys(defaults).length === 0) {
-    editor.style.display = "none";
-  } else {
-    editor.style.display = "block";
-    Object.entries(defaults).forEach(([key, defaultUrl]) => {
-      const div = document.createElement("div");
-      div.className = "link-field";
-      div.innerHTML = `<label>{${key}}</label>
-        <input type="url" placeholder="${defaultUrl}" value="${defaultUrl}" data-key="${key}" />`;
-      div.querySelector("input").addEventListener("input", e => {
-        customLinks[key] = e.target.value || defaultUrl;
-      });
-      fields.appendChild(div);
-    });
-  }
-
-  // Auto-generate on scenario selection
   generateEmail();
 }
 
-// ── Generate with AI animation ─────────────────────────────────
 async function generateEmail() {
   if (!current) return;
 
-  // Hide final card, show overlay
   document.getElementById("empty-state").style.display = "none";
-  document.getElementById("email-card").classList.remove("visible");
-  document.getElementById("banner").classList.remove("visible");
-  document.getElementById("score-box").classList.remove("visible");
-  document.getElementById("flags-list").innerHTML = "";
+  document.getElementById("email-wrapper").classList.remove("visible");
+  document.getElementById("regen-btn").disabled = true;
 
   const overlay = document.getElementById("ai-overlay");
   overlay.classList.add("visible");
 
-  // Build step elements
+  // Build steps
   const stepsEl = document.getElementById("ai-steps");
   stepsEl.innerHTML = "";
-  const stepEls = AI_STEPS.map((label, i) => {
+  const stepEls = AI_STEPS.map(label => {
     const div = document.createElement("div");
     div.className = "ai-step pending";
     div.innerHTML = `<span class="ai-step-icon"></span><span>${label}</span>`;
@@ -439,96 +305,99 @@ async function generateEmail() {
   const preview = document.getElementById("ai-preview");
   preview.innerHTML = '<span class="ai-cursor"></span>';
 
-  // Fetch real data first (we'll animate while pretending to wait)
-  const fetchPromise = fetch(`/api/generate/${current}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ links: customLinks }),
-  }).then(r => r.json());
+  const fetchPromise = fetch(`/api/generate/${current}`).then(r => r.json());
 
-  // Animate steps sequentially
-  const STEP_DELAY = 420;
   for (let i = 0; i < stepEls.length; i++) {
     stepEls[i].className = "ai-step active";
-    // Replace placeholder icon with spinner
-    stepEls[i].querySelector(".ai-step-icon").innerHTML =
-      '<span class="ai-step-spin"></span>';
-    await sleep(STEP_DELAY);
+    stepEls[i].querySelector(".ai-step-icon").innerHTML = '<span class="ai-step-spin"></span>';
+    await sleep(400);
     stepEls[i].className = "ai-step done";
     stepEls[i].querySelector(".ai-step-icon").innerHTML = "";
   }
 
-  // Get real data
-  const data = await fetchPromise;
+  lastData = await fetchPromise;
 
-  // Typewriter effect on email body
-  document.getElementById("ai-label").textContent = "Writing email body…";
-  const fullBody = data.email.body;
-  const charsPerTick = 3;
+  // Typewriter
+  document.getElementById("ai-label").textContent = "Escribiendo cuerpo…";
+  const body = lastData.body;
   let typed = "";
-  for (let i = 0; i < fullBody.length; i += charsPerTick) {
-    typed += fullBody.slice(i, i + charsPerTick);
-    preview.innerHTML = escapeHtml(typed) + '<span class="ai-cursor"></span>';
+  for (let i = 0; i < body.length; i += 3) {
+    typed += body.slice(i, i + 3);
+    preview.innerHTML = esc(typed) + '<span class="ai-cursor"></span>';
     preview.scrollTop = preview.scrollHeight;
-    await sleep(18);
+    await sleep(16);
   }
+  await sleep(280);
 
-  await sleep(300);
-
-  // Hide overlay, show real card
   overlay.classList.remove("visible");
-  renderEmail(data);
+  renderEmail(lastData);
 }
 
 function renderEmail(data) {
-  const e = data.email;
+  document.getElementById("e-subject").textContent = data.subject;
+  document.getElementById("e-name").textContent    = data.from_display;
+  document.getElementById("e-addr").textContent    = data.from_email;
 
-  document.getElementById("e-subject").textContent = e.subject;
-  document.getElementById("e-name").textContent = e.from_display;
-  document.getElementById("e-addr").textContent = e.from_email;
-
-  // Highlight links in body
-  let bodyHtml = escapeHtml(e.body);
-  const urlRe = /https?:\/\/[^\s]+/g;
-  bodyHtml = bodyHtml.replace(urlRe, m =>
-    `<span class="highlight-link">${m}</span>`
+  // Linkify URLs in body
+  let html = esc(data.body).replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank">$1</a>'
   );
-  document.getElementById("e-body").innerHTML = bodyHtml;
+  document.getElementById("e-body").innerHTML = html;
 
-  document.getElementById("email-card").classList.add("visible");
-  document.getElementById("banner").classList.add("visible");
-
-  // Score
-  const total = data.training.total_red_flags;
-  document.getElementById("score-num").innerHTML =
-    `${total} <span>flag${total !== 1 ? "s" : ""}</span>`;
-  document.getElementById("score-fill").style.width =
-    Math.min(100, Math.round(total / 8 * 100)) + "%";
-  document.getElementById("score-box").classList.add("visible");
-
-  // Flags
-  const list = document.getElementById("flags-list");
-  list.innerHTML = "";
-  data.training.red_flags.forEach(rf => {
-    const card = document.createElement("div");
-    card.className = `flag-card ${rf.severidad}`;
-    card.innerHTML = `
-      <div class="flag-top">
-        <span class="flag-sev">${rf.severidad}</span>
-        <span class="flag-elem">${rf.elemento}</span>
-      </div>
-      <div class="flag-desc">${escapeHtml(rf.descripcion)}</div>`;
-    list.appendChild(card);
-  });
+  document.getElementById("email-wrapper").classList.add("visible");
+  document.getElementById("regen-btn").disabled = false;
 }
 
-function escapeHtml(s) {
+document.getElementById("open-html-btn").onclick = () => {
+  if (!lastData) return;
+  const html = buildHtmlEmail(lastData);
+  const blob = new Blob([html], { type: "text/html" });
+  const url  = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+};
+
+document.getElementById("regen-btn").onclick = generateEmail;
+
+function buildHtmlEmail(data) {
+  const e    = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const body = e(data.body).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
+  const date = new Date().toUTCString();
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${e(data.subject)}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#f1f3f4;padding:20px}
+.wrap{max-width:680px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.18);overflow:hidden}
+.hdr{padding:20px 28px 16px;border-bottom:1px solid #e0e0e0}
+.subj{font-size:20px;font-weight:400;color:#202124;margin-bottom:14px;line-height:1.4}
+.meta{font-size:13px;color:#5f6368;line-height:1.8}
+.meta strong{color:#202124}
+.body{padding:24px 28px;font-size:14px;line-height:1.75;color:#202124;white-space:pre-wrap}
+.body a{color:#1a73e8;text-decoration:none}
+.body a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="subj">${e(data.subject)}</div>
+    <div class="meta"><strong>${e(data.from_display)}</strong> &lt;${e(data.from_email)}&gt;<br>${date}</div>
+  </div>
+  <div class="body">${body}</div>
+</div>
+</body>
+</html>`;
+}
+
+function esc(s) {
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-document.getElementById("generate-btn").onclick = generateEmail;
-document.getElementById("regen-btn").onclick = generateEmail;
 
 loadScenarios();
 </script>

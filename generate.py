@@ -1,88 +1,43 @@
 #!/usr/bin/env python3
-"""
-CLI para el generador de emails de phishing de entrenamiento.
-
-Uso:
-  python generate.py                        # Lista escenarios disponibles
-  python generate.py --scenario banco_urgente
-  python generate.py --scenario all         # Genera todos los escenarios
-  python generate.py --scenario banco_urgente --format json
-  python generate.py --scenario banco_urgente --format text
-  python generate.py --scenario banco_urgente --save
-"""
+"""MailForge CLI — genera emails de muestra por escenario."""
 
 import argparse
 import json
 import sys
 
-from phishing_trainer import EmailGenerator, list_scenarios
+from mailforge import EmailGenerator, list_scenarios
+from mailforge.generator import _render_html
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generador de emails de phishing para entrenamiento de seguridad"
-    )
-    parser.add_argument(
-        "--scenario",
-        help="Escenario a generar ('all' para todos). Omitir para listar disponibles.",
-    )
-    parser.add_argument(
-        "--format",
-        choices=["text", "json"],
-        default="text",
-        help="Formato de salida (default: text)",
-    )
-    parser.add_argument(
-        "--save",
-        action="store_true",
-        help="Guardar el resultado en el directorio output/",
-    )
-    parser.add_argument(
-        "--output-dir",
-        default="output",
-        help="Directorio de salida (default: output/)",
-    )
+    parser = argparse.ArgumentParser(description="MailForge — generador de emails")
+    parser.add_argument("--scenario", help="Escenario ('all' para todos). Omitir para listar.")
+    parser.add_argument("--format", choices=["json", "html"], default="json")
     args = parser.parse_args()
 
-    generator = EmailGenerator(output_dir=args.output_dir)
+    generator = EmailGenerator()
 
-    # Sin argumento: listar escenarios
     if not args.scenario:
-        scenarios = list_scenarios()
         print("\nEscenarios disponibles:")
-        print("-" * 40)
-        for s in scenarios:
+        for s in list_scenarios():
             print(f"  • {s}")
         print(f"\nUso: python generate.py --scenario <nombre>")
-        print(f"     python generate.py --scenario all\n")
         return
 
-    # Generar uno o todos
-    if args.scenario == "all":
-        emails = generator.generate_all()
-    else:
+    scenarios = list_scenarios() if args.scenario == "all" else [args.scenario]
+
+    for scenario in scenarios:
         try:
-            emails = [generator.generate(args.scenario)]
+            data = generator.generate(scenario)
         except ValueError as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
 
-    for email in emails:
-        if args.format == "json":
-            output = json.dumps(email, ensure_ascii=False, indent=2)
+        if args.format == "html":
+            print(_render_html(data))
         else:
-            from phishing_trainer.generator import _render_text
-            output = _render_text(email)
-
-        print(output)
+            print(json.dumps(data, ensure_ascii=False, indent=2))
         print()
-
-        if args.save:
-            if args.format == "json":
-                path = generator.save_json(email)
-            else:
-                path = generator.save_text(email)
-            print(f"  → Guardado en: {path}")
 
 
 if __name__ == "__main__":
