@@ -3,11 +3,14 @@ Generador de emails de phishing para entrenamiento de usuarios.
 Produce emails de ejemplo con anotaciones educativas — sin envío real.
 """
 
+from __future__ import annotations
+
 import json
 import random
 import string
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Dict, List, Tuple
 
 from .templates import PhishingTemplate, RedFlag, TEMPLATES, get_template, list_scenarios
 
@@ -17,7 +20,7 @@ def _random_tracking() -> str:
     return "".join(random.choices(string.digits, k=10))
 
 
-def _random_past_datetime() -> tuple[str, str]:
+def _random_past_datetime() -> Tuple[str, str]:
     delta = timedelta(hours=random.randint(1, 48))
     dt = datetime.utcnow() - delta
     return dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M")
@@ -108,7 +111,7 @@ class EmailGenerator:
         }
         return email
 
-    def generate_all(self) -> list[dict]:
+    def generate_all(self) -> List[dict]:
         return [self.generate(s) for s in list_scenarios()]
 
     def save_json(self, email: dict) -> Path:
@@ -126,7 +129,7 @@ class EmailGenerator:
         return path
 
 
-def _build_summary(red_flags: list[RedFlag]) -> str:
+def _build_summary(red_flags: List[RedFlag]) -> str:
     high = sum(1 for rf in red_flags if rf.severity == "alta")
     med = sum(1 for rf in red_flags if rf.severity == "media")
     low = sum(1 for rf in red_flags if rf.severity == "baja")
