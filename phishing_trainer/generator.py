@@ -56,7 +56,7 @@ class EmailGenerator:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 
-    def generate(self, scenario: str, custom_links: dict | None = None) -> dict:
+    def generate(self, scenario: str, custom_links=None) -> dict:
         """Generates a training phishing email for the given scenario.
 
         Args:

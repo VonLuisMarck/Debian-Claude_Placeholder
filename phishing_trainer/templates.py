@@ -4,8 +4,10 @@ Each template includes the email content and annotated red flags
 to help users learn to identify malicious emails.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -22,8 +24,8 @@ class PhishingTemplate:
     from_email: str
     subject: str
     body: str
-    red_flags: list[RedFlag] = field(default_factory=list)
-    links: dict = field(default_factory=dict)  # key → URL por defecto
+    red_flags: List[RedFlag] = field(default_factory=list)
+    links: Dict[str, str] = field(default_factory=dict)  # key → URL por defecto
 
 
 TEMPLATES: list[PhishingTemplate] = [
@@ -254,5 +256,5 @@ def get_template(scenario: str) -> Optional[PhishingTemplate]:
     return next((t for t in TEMPLATES if t.scenario == scenario), None)
 
 
-def list_scenarios() -> list[str]:
+def list_scenarios() -> List[str]:
     return [t.scenario for t in TEMPLATES]
