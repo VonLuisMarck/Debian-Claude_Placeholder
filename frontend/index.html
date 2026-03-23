@@ -207,7 +207,8 @@
 
     <div id="email-wrapper">
       <div class="email-actions">
-        <button class="open-html-btn" id="open-html-btn">↗ Abrir como HTML</button>
+        <button class="open-html-btn" id="open-html-btn">↗ Abrir en pestaña</button>
+        <button class="open-html-btn" id="download-html-btn">⬇ Descargar HTML</button>
       </div>
       <div class="email-card">
         <div class="email-toolbar">
@@ -351,10 +352,17 @@ function renderEmail(data) {
 
 document.getElementById("open-html-btn").onclick = () => {
   if (!lastData) return;
-  const html = buildHtmlEmail(lastData);
-  const blob = new Blob([html], { type: "text/html" });
-  const url  = URL.createObjectURL(blob);
-  window.open(url, "_blank");
+  const blob = new Blob([buildHtmlEmail(lastData)], { type: "text/html" });
+  window.open(URL.createObjectURL(blob), "_blank");
+};
+
+document.getElementById("download-html-btn").onclick = () => {
+  if (!lastData) return;
+  const blob = new Blob([buildHtmlEmail(lastData)], { type: "text/html" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${lastData.scenario}.html`;
+  a.click();
 };
 
 document.getElementById("regen-btn").onclick = generateEmail;
